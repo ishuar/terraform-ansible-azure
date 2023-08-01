@@ -1,0 +1,93 @@
+name: Create webservers infrastrucutre via Terraform
+on:
+  workflow_dispatch:
+    inputs:
+      terraform_version:
+        required: false
+        description: Terraform Version used to provision the infrastrucutre.
+        default: 1.5.4
+
+  pull_request:
+    paths:
+    - "terraform/**"
+
+env:
+  TERRAFORM_CODE_DIR: "terraform"
+  TERRAFORM_PLAN_NAME: "webservers.tfplan"
+  ##? https://developer.hashicorp.com/terraform/cli/config/environment-variables
+  TF_PLUGIN_CACHE_DIR: "${{ github.workspace }}/.terraform-plugin-cache"
+  TF_IN_AUTOMATION: true
+  TF_INPUT: false
+
+jobs:
+  codeScanning:
+    name: IaC Scanning with tfsec Stage
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout the repository
+        uses: actions/checkout@v3
+
+      - name: tfsec pull request commentor if found vulnerabilities
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: aquasecurity/tfsec-pr-commenter-action@v1.3.1
+        id: tfsec-pr-commenter
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          working_directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
+
+      - name: IaC Security Scanning with tfsec
+        uses: aquasecurity/tfsec-action@v1.0.3
+        id: tfsec
+        with:
+          working_directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
+
+  deploymentPLan:
+    name: Terraform webservers deployment Plan Stage
+    runs-on: ubuntu-latest
+    needs: codeScanning
+
+    steps:
+      - name: checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ inputs.terraform_version }}
+
+      - name: Terraform init and plan
+        shell: bash
+        working-directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
+        run: |
+          terraform init
+          terraform validate
+          terraform plan -out "${{ env.TERRAFORM_PLAN_NAME }}" -detailed-exitcode
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: "${{ env.TERRAFORM_PLAN_NAME }}"
+          path: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}/${{ env.TERRAFORM_PLAN_NAME }}"
+
+  deploymentApply:
+    name: Terraform webservers deployment Apply Stage
+    runs-on: ubuntu-latest
+    needs: deploymentPLan
+    steps:
+      - name: checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ inputs.terraform_version }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: "${{ env.TERRAFORM_PLAN_NAME }}"
+          path: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
+
+      - name: "Terraform Apply"
+        shell: bash
+        working-directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
+        run: terraform apply "${{ env.TERRAFORM_PLAN_NAME }}"

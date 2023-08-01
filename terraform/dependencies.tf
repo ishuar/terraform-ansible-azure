@@ -69,6 +69,10 @@ resource "azurerm_network_security_rule" "ssh" {
   destination_address_prefixes = azurerm_subnet.webservers.address_prefixes ## Allowed SSH on the subnet level, could be hardened on NIC level.
 }
 
+## ? https://aquasecurity.github.io/trivy/v0.44/docs/configuration/filtering/#by-inline-comments if migrating to trivy
+#tfsec:ignore:azure-network-ssh-blocked-from-internet
+#tfsec:ignore:azure-network-disable-rdp-from-internet
+#tfsec:ignore:azure-network-no-public-ingress
 resource "azurerm_network_security_rule" "http" {
   access                       = "Allow"
   direction                    = "Inbound"

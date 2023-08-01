@@ -62,6 +62,11 @@ jobs:
           terraform init
           terraform validate
           terraform plan -out "${{ env.TERRAFORM_PLAN_NAME }}" -detailed-exitcode
+        env:
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
@@ -91,3 +96,8 @@ jobs:
         shell: bash
         working-directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
         run: terraform apply "${{ env.TERRAFORM_PLAN_NAME }}"
+        env:
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}

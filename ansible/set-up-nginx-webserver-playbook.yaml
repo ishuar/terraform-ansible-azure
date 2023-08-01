@@ -1,0 +1,61 @@
+---
+- name: Set up Nginx Webserver
+  hosts: "{{dynamicHosts}}"
+  gather_facts: yes
+  remote_user: adminuser
+  become: true
+  connection: ssh
+  vars:
+    packages:
+      - curl  ## Not required for Nginx
+      - vim   ## Not required for Nginx
+      - git   ## Not required for Nginx
+      - ufw
+      - nginx
+    files:
+      - ./files/index.html
+      - ./files/github-mark.png
+
+  tasks:
+    - name: Update apt and install required system packages
+      apt:
+        pkg:
+          - "{{ item }}"
+        state: latest
+        update_cache: true ## equivalent of "apt-get update"
+      loop: "{{ packages }}"
+
+    - name: UFW - Allow SSH connections
+      community.general.ufw:
+        rule: allow
+        name: OpenSSH ## Allow SSH connections through FW
+
+    - name: UFW - Allow SSH connections
+      community.general.ufw:
+        rule: allow
+        name: 'Nginx HTTP' ## Use 'Nginx HTTPS' if Nginx is configurred to listen on HTTPS
+
+    - name: UFW - Enable and deny by default
+      community.general.ufw:
+        state: enabled
+        default: deny
+
+    - name: Start Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Use custom webpage
+      copy:
+        src: "{{ item }}"
+        dest: /var/www/html/
+      loop: "{{ files }}"
+      notify:
+      - Restart nginx
+
+  handlers:
+    - name: Restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted

@@ -95,7 +95,9 @@ jobs:
       - name: "Terraform Apply"
         shell: bash
         working-directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
-        run: terraform apply "${{ env.TERRAFORM_PLAN_NAME }}"
+        run: |
+          terraform init
+          terraform apply "${{ env.TERRAFORM_PLAN_NAME }}"
         env:
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}

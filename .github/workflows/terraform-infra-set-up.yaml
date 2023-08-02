@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
     - "terraform/**"
+    - ".github/workflows/terraform-infra-set-up.yaml"
 
 env:
   TERRAFORM_CODE_DIR: "terraform"
@@ -18,6 +19,9 @@ env:
   TF_PLUGIN_CACHE_DIR: "${{ github.workspace }}/.terraform-plugin-cache"
   TF_IN_AUTOMATION: true
   TF_INPUT: false
+
+concurrency:
+  group: terraform-webservers
 
 jobs:
   codeScanning:

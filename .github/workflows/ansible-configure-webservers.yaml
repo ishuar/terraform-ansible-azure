@@ -2,6 +2,13 @@ name: Configure Nginx webservers via Ansible
 on:
   workflow_dispatch:
 
+  push:
+    branches:
+      - main
+    paths:
+    - "ansible/**"
+    - ".github/workflows/ansible-configure-webservers.yaml"
+
   pull_request:
     paths:
     - "ansible/**"

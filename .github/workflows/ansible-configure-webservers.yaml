@@ -28,6 +28,11 @@ jobs:
         with:
           python-version: ${{ inputs.python-version }}
 
+      ## https://github.com/Homebrew/actions/tree/master/setup-homebrew
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
         ## https://github.com/ansible/ansible/issues/80526
       - name: Install Ansible
         shell: bash
@@ -37,6 +42,8 @@ jobs:
           pip3 install msrest -I
           ansible-galaxy collection install azure.azcollection
           pip3 install -r ${{ github.workspace }}/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
+          which python3
+          which ansible
 
       - name: Run ansible playbook
         shell: bash

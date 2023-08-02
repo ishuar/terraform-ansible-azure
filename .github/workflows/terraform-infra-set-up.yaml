@@ -55,6 +55,18 @@ jobs:
         with:
           terraform_version: ${{ inputs.terraform_version }}
 
+      - uses: actions/cache@v3
+        name: "Terraform cache"
+        id: cache
+        with:
+          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+          key: ${{ runner.os }}-${{ env.TERRAFORM_CODE_DIR }}-${{ hashFiles(format('{0}/{1}', env.TERRAFORM_CODE_DIR , '/providers.tf')) }}
+
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        name: Create TF_PLUGIN_CACHE_DIR
+        shell: bash
+        run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
+
       - name: Terraform init and plan
         shell: bash
         working-directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
@@ -73,18 +85,6 @@ jobs:
         with:
           name: "${{ env.TERRAFORM_PLAN_NAME }}"
           path: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}/${{ env.TERRAFORM_PLAN_NAME }}"
-
-      - uses: actions/cache@v3
-        name: "Terraform cache"
-        id: cache
-        with:
-          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-          key: ${{ runner.os }}-tf-${{ env.TERRAFORM_CODE_DIR }}-${{ hashFiles(format('{0}/{1}', env.TERRAFORM_CODE_DIR , '/providers.tf')) }}
-
-      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        name: Create TF_PLUGIN_CACHE_DIR
-        shell: bash
-        run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
 
   deploymentApply:
     name: Terraform webservers deployment Apply Stage
@@ -109,7 +109,7 @@ jobs:
         id: cache
         with:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-          key: ${{ runner.os }}-tf-${{ env.TERRAFORM_CODE_DIR }}-${{ hashFiles(format('{0}/{1}', env.TERRAFORM_CODE_DIR , '/providers.tf')) }}
+          key: ${{ runner.os }}-${{ env.TERRAFORM_CODE_DIR }}-${{ hashFiles(format('{0}/{1}', env.TERRAFORM_CODE_DIR , '/providers.tf')) }}
 
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         name: Create TF_PLUGIN_CACHE_DIR

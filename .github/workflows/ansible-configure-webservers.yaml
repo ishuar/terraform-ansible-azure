@@ -23,11 +23,6 @@ jobs:
       - name: checkout the repository
         uses: actions/checkout@v3
 
-      - name: Install Python3
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ inputs.python-version }}
-
       ## https://github.com/Homebrew/actions/tree/master/setup-homebrew
       - name: Set up Homebrew
         id: set-up-homebrew
@@ -41,7 +36,7 @@ jobs:
           brew install ansible
           pip3 install msrest -I
           ansible-galaxy collection install azure.azcollection
-          pip3 install -r ${{ github.workspace }}/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
+          pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
           which python3
           which ansible
 

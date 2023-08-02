@@ -1,11 +1,6 @@
 name: Configure Nginx webservers via Ansible
 on:
   workflow_dispatch:
-    inputs:
-      python-version:
-        required: false
-        description: Python Version used with ansible.
-        default: '3.11'
 
   pull_request:
     paths:
@@ -23,10 +18,10 @@ jobs:
       - name: checkout the repository
         uses: actions/checkout@v3
 
-      - name: Install Python3
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ inputs.python-version }}
+      ## https://github.com/Homebrew/actions/tree/master/setup-homebrew
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
 
         ## https://github.com/ansible/ansible/issues/80526
       - name: Install Ansible
@@ -36,13 +31,20 @@ jobs:
           brew install ansible
           pip3 install msrest -I
           ansible-galaxy collection install azure.azcollection
-          pip3 install -r ${{ github.workspace }}/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
+          pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
+          which python3
+          which ansible
+
+      - name: Add private key to SSH Agent
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.PASSWORDLESS_SSH_PRIVATE_KEY }}
 
       - name: Run ansible playbook
         shell: bash
         working-directory: ${{ github.workspace }}/ansible
-        run: |
-            ansible-playbook set-up-nginx-webserver-playbook.yaml --extra-vars=dynamicHosts=role_slave -i my.azure_rm.yaml --private-key ${{ secrets.PASSWORDLESS_SSH_PRIVATE_KEY }}
+        run: |-
+            ansible-playbook set-up-nginx-webserver-playbook.yaml --extra-vars=dynamicHosts=role_slave -i my.azure_rm.yaml
         env:
           AZURE_CLIENT_ID:  ${{ secrets.ARM_CLIENT_ID }}
           AZURE_SECRET:  ${{ secrets.ARM_CLIENT_SECRET }}

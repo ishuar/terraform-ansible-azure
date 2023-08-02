@@ -1,11 +1,6 @@
 name: Create webservers infrastrucutre via Terraform
 on:
   workflow_dispatch:
-    inputs:
-      terraform_version:
-        required: false
-        description: Terraform Version used to provision the infrastrucutre.
-        default: 1.5.4
 
   pull_request:
     paths:
@@ -50,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: codeScanning
     outputs:
-      exitCode: ${{ steps.plan.outputs.exitCode }}
+      exitCode: ${{ steps.plan.outputs.exitcode }}
 
     steps:
       - name: checkout the repository
@@ -59,7 +54,7 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: ${{ inputs.terraform_version }}
+          terraform_version: ${{ vars.TERRAFORM_VERSION }}
 
       - uses: actions/cache@v3
         name: "Terraform cache"
@@ -81,14 +76,6 @@ jobs:
           terraform init
           terraform validate
           terraform plan -out "${{ env.TERRAFORM_PLAN_NAME }}" -detailed-exitcode
-
-          set +e
-          EXIT_CODE=$?
-          if [[ $EXIT_CODE -ne 2 ]] && [[ $EXIT_CODE -ne 0 ]]; then
-            exit $EXIT_CODE
-          fi
-
-          echo "exitCode=$EXIT_CODE" >> $GITHUB_OUTPUT
         env:
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
@@ -102,7 +89,7 @@ jobs:
           path: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}/${{ env.TERRAFORM_PLAN_NAME }}"
 
   deploymentApply:
-    if: ${{ needs.deploymentPLan.outputs.exitCode == 2 }}
+    if: ${{ !cancelled() && !failure() && needs.deploymentPLan.outputs.exitCode == 2 }}
     name: Terraform webservers deployment Apply Stage
     runs-on: ubuntu-latest
     needs: deploymentPLan
@@ -113,7 +100,7 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: ${{ inputs.terraform_version }}
+          terraform_version: ${{ vars.TERRAFORM_VERSION }}
 
       - uses: actions/download-artifact@v3
         with:

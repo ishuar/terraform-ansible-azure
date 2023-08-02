@@ -24,6 +24,8 @@ resource "azurerm_network_interface" "public" {
   }
 }
 
+## Info: Add NSG rule (manually) to allow 22 to only public IP assigned to local machine to access VMs.
+## Can not use "https://ipinfo.io/ip" anymore because of Github action executing the code.
 resource "azurerm_linux_virtual_machine" "slaves" {
   for_each = toset(local.webservers)
 
@@ -42,7 +44,7 @@ resource "azurerm_linux_virtual_machine" "slaves" {
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key = file("~/.ssh/rsa-ansible-azure.pub")
+    public_key = file("./ssh_keys/rsa-ansible-azure.pub")
   }
 
   source_image_reference {

@@ -45,6 +45,8 @@ jobs:
     name: Terraform webservers deployment Plan Stage
     runs-on: ubuntu-latest
     needs: codeScanning
+    outputs:
+      exitCode: ${{ steps.plan.outputs.exitCode }}
 
     steps:
       - name: checkout the repository
@@ -55,13 +57,39 @@ jobs:
         with:
           terraform_version: ${{ inputs.terraform_version }}
 
+      - uses: actions/cache@v3
+        name: "Terraform cache"
+        id: cache
+        with:
+          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+          key: ${{ runner.os }}-${{ env.TERRAFORM_CODE_DIR }}-${{ hashFiles(format('{0}/{1}', env.TERRAFORM_CODE_DIR , '/providers.tf')) }}
+
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        name: Create TF_PLUGIN_CACHE_DIR
+        shell: bash
+        run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
+
       - name: Terraform init and plan
         shell: bash
+        id: plan
         working-directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
         run: |
           terraform init
           terraform validate
           terraform plan -out "${{ env.TERRAFORM_PLAN_NAME }}" -detailed-exitcode
+
+          set +e
+          EXIT_CODE=$?
+          if [[ $EXIT_CODE -ne 2 ]] && [[ $EXIT_CODE -ne 0 ]]; then
+            exit $EXIT_CODE
+          fi
+
+          echo "exitCode=$EXIT_CODE" >> $GITHUB_OUTPUT
+        env:
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
@@ -70,6 +98,7 @@ jobs:
           path: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}/${{ env.TERRAFORM_PLAN_NAME }}"
 
   deploymentApply:
+    if: ${{ needs.deploymentPLan.outputs.exitCode == 2 }}
     name: Terraform webservers deployment Apply Stage
     runs-on: ubuntu-latest
     needs: deploymentPLan
@@ -87,7 +116,21 @@ jobs:
           name: "${{ env.TERRAFORM_PLAN_NAME }}"
           path: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
 
+      - uses: actions/cache@v3
+        name: "Terraform cache"
+        id: cache
+        with:
+          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+          key: ${{ runner.os }}-${{ env.TERRAFORM_CODE_DIR }}-${{ hashFiles(format('{0}/{1}', env.TERRAFORM_CODE_DIR , '/providers.tf')) }}
+
       - name: "Terraform Apply"
         shell: bash
         working-directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
-        run: terraform apply "${{ env.TERRAFORM_PLAN_NAME }}"
+        run: |
+          terraform init
+          terraform apply "${{ env.TERRAFORM_PLAN_NAME }}"
+        env:
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}

@@ -48,41 +48,6 @@ resource "azurerm_network_security_rule" "lb_to_webservers" {
   destination_address_prefixes = azurerm_subnet.webservers.address_prefixes
 }
 
-data "http" "self_ip" {
-  url = "https://ipinfo.io/ip"
-  request_headers = {
-    Accept = "application/text"
-  }
-}
-
-resource "azurerm_network_security_rule" "ssh" {
-  access                       = "Allow"
-  direction                    = "Inbound"
-  name                         = "AllowSSH"
-  priority                     = 101
-  protocol                     = "Tcp"
-  source_port_range            = "*"
-  source_address_prefix        = data.http.self_ip.response_body
-  destination_port_ranges      = [22]
-  resource_group_name          = azurerm_resource_group.main.name
-  network_security_group_name  = azurerm_network_security_group.webserver.name
-  destination_address_prefixes = azurerm_subnet.webservers.address_prefixes ## Allowed SSH on the subnet level, could be hardened on NIC level.
-}
-
-resource "azurerm_network_security_rule" "http" {
-  access                       = "Allow"
-  direction                    = "Inbound"
-  name                         = "AllowHTTP"
-  priority                     = 102
-  protocol                     = "Tcp"
-  source_port_range            = "*"
-  source_address_prefix        = "*"
-  destination_port_ranges      = [80]
-  resource_group_name          = azurerm_resource_group.main.name
-  network_security_group_name  = azurerm_network_security_group.webserver.name
-  destination_address_prefixes = azurerm_subnet.webservers.address_prefixes ## Allowed HTTP on the subnet level, could be hardened on NIC level.
-}
-
 resource "azurerm_network_interface_security_group_association" "webserver" {
   for_each = toset(local.webservers)
 

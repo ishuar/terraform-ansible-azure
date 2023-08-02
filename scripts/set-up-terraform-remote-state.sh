@@ -57,13 +57,16 @@ if [[ "$LOWER_CASE_RESPONSE" == "yes" || "$LOWER_CASE_RESPONSE" == "y" ]]; then
     if ! az storage container show --account-name "$STORAGE_ACCOUNT_NAME" --name "$CONTAINER_NAME" --account-key "$ACCOUNT_KEY" &>/dev/null; then
       az storage container create --name "$CONTAINER_NAME" --account-name "$STORAGE_ACCOUNT_NAME" --account-key "$ACCOUNT_KEY"
     else
-      echo "-> Storage Container with name  $CONTAINER_NAME  already exists in storage account $STORAGE_ACCOUNT_NAME"
+      echo -e "-> Storage Container with name $CONTAINER_NAME already exists in storage account $STORAGE_ACCOUNT_NAME \n"
     fi
 
     printf '\e[1;32m%-6s\e[0m\n' "Resource Group Name: $RESOURCE_GROUP_NAME"
     printf '\e[1;32m%-6s\e[0m\n' "Storage Account Name: $STORAGE_ACCOUNT_NAME"
-    printf '\e[1;32m%-6s\e[0m\n' "Terraform State Container Name: $CONTAINER_NAME"
+    printf '\e[1;32m%-6s\e[0m\n\n' "Terraform State Container Name: $CONTAINER_NAME"
+
+    printf "##############################################################\n"
     printf '\e[1;31m%-6s\e[0m\n' "Configure the terraform backend with the above configurations"
+    printf "##############################################################\n\n"
 
   else
     if [[ $(command -v brew) ]]; then

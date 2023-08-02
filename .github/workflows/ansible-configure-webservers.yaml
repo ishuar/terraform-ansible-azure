@@ -1,0 +1,50 @@
+name: Configure Nginx webservers via Ansible
+on:
+  workflow_dispatch:
+    inputs:
+      python-version:
+        required: false
+        description: Python Version used with ansible.
+        default: '3.11'
+
+  pull_request:
+    paths:
+    - "ansible/**"
+    - ".github/workflows/ansible-configure-webservers.yaml"
+
+concurrency:
+  group: ansible-webservers
+
+jobs:
+  configureWebservers:
+    name: Configure Linux VM as Nginx Webservers via Ansible
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Install Python3
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+
+        ## https://github.com/ansible/ansible/issues/80526
+      - name: Install Ansible
+        shell: bash
+        run: |
+          export LC_ALL=en_US.UTF-8
+          brew install ansible
+          pip3 install msrest -I
+          ansible-galaxy collection install azure.azcollection
+          pip3 install -r ${{ github.workspace }}/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
+
+      - name: Run ansible playbook
+        shell: bash
+        working-directory: ${{ github.workspace }}/ansible
+        run: |
+            ansible-playbook set-up-nginx-webserver-playbook.yaml --extra-vars=dynamicHosts=role_slave -i my.azure_rm.yaml --private-key ${{ secrets.PASSWORDLESS_SSH_PRIVATE_KEY }}
+        env:
+          AZURE_CLIENT_ID:  ${{ secrets.ARM_CLIENT_ID }}
+          AZURE_SECRET:  ${{ secrets.ARM_CLIENT_SECRET }}
+          AZURE_TENANT: ${{ secrets.ARM_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}

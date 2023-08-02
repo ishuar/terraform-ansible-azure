@@ -32,8 +32,6 @@ jobs:
           pip3 install msrest -I
           ansible-galaxy collection install azure.azcollection
           pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
-          which python3
-          which ansible
 
       - name: Add private key to SSH Agent
         uses: webfactory/ssh-agent@v0.8.0

@@ -111,11 +111,6 @@ jobs:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
           key: ${{ runner.os }}-${{ env.TERRAFORM_CODE_DIR }}-${{ hashFiles(format('{0}/{1}', env.TERRAFORM_CODE_DIR , '/providers.tf')) }}
 
-      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        name: Create TF_PLUGIN_CACHE_DIR
-        shell: bash
-        run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
-
       - name: "Terraform Apply"
         shell: bash
         working-directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"

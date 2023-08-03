@@ -15,7 +15,7 @@ on:
     - ".github/workflows/terraform-infra-set-up.yaml"
 
 env:
-  TERRAFORM_CODE_DIR: "terraform"
+  TERRAFORM_CODE_DIR: "terraform/linux-webserver-with-loadbalancer"
   TERRAFORM_PLAN_NAME: "webservers.tfplan"
   TF_VAR_ENABLE_LOCAL_DEVELOPMENT: false
   ##? https://developer.hashicorp.com/terraform/cli/config/environment-variables

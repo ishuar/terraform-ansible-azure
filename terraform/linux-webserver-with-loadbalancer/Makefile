@@ -28,8 +28,12 @@ plan: ## Terraform plan
 	@terraform plan
 
 .Phony: apply
-apply: ## Apply the Terraform configuration
-	@terraform apply
+apply: ## Apply the Terraform configuration, will not ask for approval.
+	@terraform apply -auto-approve
+
+.Phony: destroy
+destroy: ## Destroy the provisioned infrastructure, will not ask for approval.
+	@terraform destroy -auto-approve
 
 .Phony: initlock
 initlock: init ## Initialize and lock providers

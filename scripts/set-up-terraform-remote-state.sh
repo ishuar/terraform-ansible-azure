@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+##? This script will help you to create terraform remote azurerm backend resources.
+##? Please go through the notifications/notes available in the script.
+##? Script will create and check if existing : Resource Group, Storage Account and Storage Container.
+##? To Over-ride the names for the resources, kindly set the respected environment variables.
+##? LOCATION :: RESOURCE_GROUP_NAME :: STORAGE_ACCOUNT_NAME :: CONTAINER_NAME
+
 set -ue
 
 printf '\e[1;31m%-6s\e[0m\n' "### IMPORTANT NOTE ###: Please login to azure first using az login and set up correct azure subscription"

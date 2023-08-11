@@ -31,3 +31,4 @@ jobs:
     with:
       terraform-dir: "terraform/linux-webserver-with-loadbalancer"
       terraform-version: ${{ vars.TERRAFORM_VERSION }}
+    secrets: inherit

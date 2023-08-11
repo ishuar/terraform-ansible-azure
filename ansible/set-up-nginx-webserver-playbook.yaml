@@ -30,7 +30,7 @@
         rule: allow
         name: OpenSSH ## Allow SSH connections through FW
 
-    - name: UFW - Allow SSH connections
+    - name: UFW - Allow Nginx Http connections
       community.general.ufw:
         rule: allow
         name: 'Nginx HTTP' ## Use 'Nginx HTTPS' if Nginx is configurred to listen on HTTPS

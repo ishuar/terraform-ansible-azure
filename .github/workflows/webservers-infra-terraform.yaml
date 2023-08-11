@@ -1,0 +1,32 @@
+name: "Create Webservers Infrastructure"
+on:
+  workflow_dispatch:
+    inputs:
+      terraform-version:
+        type: number
+        required: false
+        default: 1.5.4
+        description: The terraform version used for the github action.
+
+      inputs.cache-hash-file:
+        type: string
+        required: false
+        default: '/providers.tf'
+        description: The file used to create common hash cache naming.
+  push:
+      branches:
+        - main
+      paths:
+      - "terraform/**"
+      - ".github/workflows/terraform-infra-set-up.yaml"
+
+  pull_request:
+    paths:
+    - "terraform/**"
+    - ".github/workflows/terraform-infra-set-up.yaml"
+jobs:
+  webserversInfra:
+    name: Create infrastructure for webservers
+    uses: ./.github/workflows/terraform-infra-set-up.yaml
+    with:
+      terraform-dir: "terraform/linux-webserver-with-loadbalancer"

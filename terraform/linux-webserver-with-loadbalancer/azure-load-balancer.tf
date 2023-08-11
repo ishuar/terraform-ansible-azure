@@ -30,10 +30,11 @@ resource "azurerm_lb_backend_address_pool" "nginx_webservers" {
 
 # Resource-4: Create LB Probe
 resource "azurerm_lb_probe" "web_lb_probe" {
-  name            = "tcp-probe"
-  protocol        = "Tcp"
+  name            = "Http-probe"
+  protocol        = "Http"
   port            = 80
   loadbalancer_id = azurerm_lb.web_lb.id
+  request_path    = "/"
 }
 
 # Resource-5: Create LB Rule

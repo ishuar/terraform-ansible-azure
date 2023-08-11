@@ -1,35 +1,59 @@
-name: Create webservers infrastrucutre via Terraform
+name: "Create Infrastrucutre via Terraform"
 on:
-  workflow_dispatch:
-
-  push:
-    branches:
-      - main
-    paths:
-    - "terraform/**"
-    - ".github/workflows/terraform-infra-set-up.yaml"
-
-  pull_request:
-    paths:
-    - "terraform/**"
-    - ".github/workflows/terraform-infra-set-up.yaml"
+  workflow_call:
+    inputs:
+      terraform-dir:
+        type: string
+        required: true
+        description: The directory which contains terraform configuration used to create infrastrucutre.
+      terraform-plan-name:
+        type: string
+        required: false
+        default: terraform.tfplan
+        description: The terraform plan name used to create artifact and in apply job.
+      concurrency-group:
+        type: string
+        required: false
+        default: terraform
+        description: Concurrency group for the github action.
+      terraform-version:
+        type: number
+        required: false
+        default: 1.5.4
+        description: The terraform version used for the github action.
+      runner:
+        type: string
+        required: false
+        default: ubuntu-latest
+        description: The Github action runner OS , on which the action runs.
+      inputs.cache-hash-file:
+        type: string
+        required: false
+        default: '/providers.tf'
+        description: The file used to create common hash cache naming.
 
 env:
-  TERRAFORM_CODE_DIR: "terraform/linux-webserver-with-loadbalancer"
-  TERRAFORM_PLAN_NAME: "webservers.tfplan"
+  ##? To disable local development, not create SSH rule from the host.
   TF_VAR_ENABLE_LOCAL_DEVELOPMENT: false
+  TERRAFORM_PLAN_NAME: "{{ inputs.terraform-plan-name }}"
   ##? https://developer.hashicorp.com/terraform/cli/config/environment-variables
   TF_PLUGIN_CACHE_DIR: "${{ github.workspace }}/.terraform-plugin-cache"
   TF_IN_AUTOMATION: true
   TF_INPUT: false
 
+  ## Azure Secrets
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+
 concurrency:
-  group: terraform-webservers
+  group: "{{ inputs.concurrency-group }}"
 
 jobs:
   codeScanning:
     name: IaC Scanning with tfsec Stage
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     steps:
       - name: checkout the repository
         uses: actions/checkout@v3
@@ -40,17 +64,17 @@ jobs:
         id: tfsec-pr-commenter
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          working_directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
+          working_directory: "${{ github.workspace }}/${{ inputs.terraform-dir }}"
 
       - name: IaC Security Scanning with tfsec
         uses: aquasecurity/tfsec-action@v1.0.3
         id: tfsec
         with:
-          working_directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
+          working_directory: "${{ github.workspace }}/${{ inputs.terraform-dir }}"
 
   deploymentPLan:
     name: Terraform webservers deployment Plan Stage
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     needs: codeScanning
     outputs:
       exitCode: ${{ steps.plan.outputs.exitcode }}
@@ -62,14 +86,14 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: ${{ vars.TERRAFORM_VERSION }}
+          terraform_version: ${{ inputs.terraform-version }}
 
       - uses: actions/cache@v3
         name: "Terraform cache"
         id: cache
         with:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-          key: ${{ runner.os }}-${{ env.TERRAFORM_CODE_DIR }}-${{ hashFiles(format('{0}/{1}', env.TERRAFORM_CODE_DIR , '/providers.tf')) }}
+          key: ${{ runner.os }}-${{ inputs.terraform-dir }}-${{ hashFiles(format('{0}/{1}', inputs.terraform-dir , inputs.cache-hash-file)) }}
 
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         name: Create TF_PLUGIN_CACHE_DIR
@@ -79,27 +103,22 @@ jobs:
       - name: Terraform init and plan
         shell: bash
         id: plan
-        working-directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
+        working-directory: "${{ github.workspace }}/${{ inputs.terraform-dir }}"
         run: |
           terraform init
           terraform validate
-          terraform plan -out "${{ env.TERRAFORM_PLAN_NAME }}" -detailed-exitcode
-        env:
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+          terraform plan -out "${{ inputs.terraform-plan-name }}" -detailed-exitcode
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: "${{ env.TERRAFORM_PLAN_NAME }}"
-          path: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}/${{ env.TERRAFORM_PLAN_NAME }}"
+          name: "${{ inputs.terraform-plan-name }}"
+          path: "${{ github.workspace }}/${{ inputs.terraform-dir }}/${{ inputs.terraform-plan-name }}"
 
   deploymentApply:
     if: ${{ !cancelled() && !failure() && needs.deploymentPLan.outputs.exitCode == 2 }}
     name: Terraform webservers deployment Apply Stage
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     needs: deploymentPLan
     steps:
       - name: checkout the repository
@@ -108,28 +127,24 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: ${{ vars.TERRAFORM_VERSION }}
+          terraform_version: ${{ inputs.terraform-version }}
 
       - uses: actions/download-artifact@v3
         with:
-          name: "${{ env.TERRAFORM_PLAN_NAME }}"
-          path: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
+          name: "${{ inputs.terraform-plan-name }}"
+          path: "${{ github.workspace }}/${{ inputs.terraform-dir }}"
 
       - uses: actions/cache@v3
         name: "Terraform cache"
         id: cache
         with:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-          key: ${{ runner.os }}-${{ env.TERRAFORM_CODE_DIR }}-${{ hashFiles(format('{0}/{1}', env.TERRAFORM_CODE_DIR , '/providers.tf')) }}
+          key: ${{ runner.os }}-${{ inputs.terraform-dir }}-${{ hashFiles(format('{0}/{1}', inputs.terraform-dir , inputs.cache-hash-file)) }}
 
       - name: "Terraform Apply"
         shell: bash
-        working-directory: "${{ github.workspace }}/${{ env.TERRAFORM_CODE_DIR }}"
+        working-directory: "${{ github.workspace }}/${{ inputs.terraform-dir }}"
         run: |
           terraform init
-          terraform apply "${{ env.TERRAFORM_PLAN_NAME }}"
-        env:
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+          terraform apply "${{ inputs.terraform-plan-name }}"
+

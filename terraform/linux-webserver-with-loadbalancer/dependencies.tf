@@ -72,7 +72,7 @@ resource "azurerm_network_security_rule" "ssh" {
   access                       = "Allow"
   direction                    = "Inbound"
   name                         = "AllowSSH"
-  priority                     = 101
+  priority                     = 400
   protocol                     = "Tcp"
   source_port_range            = "*"
   source_address_prefix        = data.http.self_ip[0].response_body

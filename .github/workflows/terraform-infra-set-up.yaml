@@ -17,7 +17,7 @@ on:
         default: terraform
         description: Concurrency group for the github action.
       terraform-version:
-        type: number
+        type: string
         required: false
         default: 1.5.4
         description: The terraform version used for the github action.
@@ -26,7 +26,7 @@ on:
         required: false
         default: ubuntu-latest
         description: The Github action runner OS , on which the action runs.
-      inputs.cache-hash-file:
+      cache-hash-file:
         type: string
         required: false
         default: '/providers.tf'
@@ -53,7 +53,7 @@ concurrency:
 jobs:
   codeScanning:
     name: IaC Scanning with tfsec Stage
-    runs-on: ${{ inputs.runner }}
+    runs-on: "${{ inputs.runner }}"
     steps:
       - name: checkout the repository
         uses: actions/checkout@v3

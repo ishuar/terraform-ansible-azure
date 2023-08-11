@@ -5,7 +5,7 @@ on:
       terraform-version:
         type: number
         required: false
-        default: 1.5.4
+        default: string
         description: The terraform version used for the github action.
 
       inputs.cache-hash-file:

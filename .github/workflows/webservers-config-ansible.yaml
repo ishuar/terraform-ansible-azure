@@ -16,6 +16,9 @@ on:
     - ".github/workflows/set-up-ubuntu-nginx-webserver.yaml"
     - ".github/workflows/ansible-set-up.yaml"
 
+concurrency:
+  group: ansible-webservers
+
 jobs:
   webserversConfig:
     name: Configure Nginx webservers

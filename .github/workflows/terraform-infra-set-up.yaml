@@ -11,11 +11,6 @@ on:
         required: false
         default: terraform.tfplan
         description: The terraform plan name used to create artifact and in apply job.
-      concurrency-group:
-        type: string
-        required: false
-        default: terraform
-        description: Concurrency group for the github action.
       terraform-version:
         type: string
         required: false
@@ -46,9 +41,6 @@ env:
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
-
-concurrency:
-  group: "{{ inputs.concurrency-group }}"
 
 jobs:
   codeScanning:

@@ -19,16 +19,22 @@ on:
       paths:
       - "terraform/**"
       - ".github/workflows/terraform-infra-set-up.yaml"
+      - ".github/workflows/webservers-infra-terraform.yaml"
 
   pull_request:
     paths:
     - "terraform/**"
     - ".github/workflows/terraform-infra-set-up.yaml"
+    - ".github/workflows/webservers-infra-terraform.yaml"
+
+concurrency:
+  group: terraform-webservers
+
 jobs:
   webserversInfra:
     name: Create infrastructure for webservers
     uses: ./.github/workflows/terraform-infra-set-up.yaml
     with:
       terraform-dir: "terraform/linux-webserver-with-loadbalancer"
-      terraform-version: ${{ vars.TERRAFORM_VERSION }}
+      terraform-version: ${{ inputs.terraform-version != '' && inputs.terraform-version || vars.TERRAFORM_VERSION }}
     secrets: inherit

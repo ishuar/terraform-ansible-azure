@@ -45,23 +45,8 @@ jobs:
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-        ## https://github.com/ansible/ansible/issues/80526
-      - name: Install Ansible
-        shell: bash
-        run: |
-          brew install terraform
-          export LC_ALL=en_US.UTF-8
-          brew install ansible
-          pip3 install msrest -I
-          ansible-galaxy collection install azure.azcollection
-          pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
-
-      - name: Azure Login
-        uses: Azure/login@v1
-        with:
-          creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
-
-        ## https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+      - uses: hashicorp/setup-terraform@v2
+      ## https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       - name: Terraform Outputs for Temporary NSG Rule
         shell: bash
         id: terraform-outputs
@@ -71,6 +56,16 @@ jobs:
           echo "NSG_NAME=$(terraform output nsg_name)" >> $GITHUB_ENV
           echo "RESOURCE_GROUP_NAME=$(terraform output resource_group)" >> $GITHUB_ENV
           echo "WEBSERVERS_SNET_ADDRESS=$(terraform output webservers_snet_address_prefix)" >> $GITHUB_ENV
+        env:
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
 
       - name: Create Temporary NSG Rule
         uses: azure/CLI@v1
@@ -81,6 +76,17 @@ jobs:
             az network nsg rule create --resource-group $RESOURCE_GROUP_NAME \
             --nsg-name $NSG_NAME --name TempAllowSSHAny --priority 4096 --protocol Tcp \
             --destination-address-prefixes=$WEBSERVERS_SNET_ADDRESS --destination-port-ranges="22"
+
+        ## https://github.com/ansible/ansible/issues/80526
+      - name: Install Ansible
+        shell: bash
+        run: |
+          brew install terraform
+          export LC_ALL=en_US.UTF-8
+          brew install ansible
+          pip3 install msrest -I
+          ansible-galaxy collection install azure.azcollection
+          pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
 
       - name: Add private key to SSH Agent
         uses: webfactory/ssh-agent@v0.8.0

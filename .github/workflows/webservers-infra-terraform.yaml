@@ -5,10 +5,10 @@ on:
       terraform-version:
         type: number
         required: false
-        default: string
+        default: 1.5.4
         description: The terraform version used for the github action.
 
-      inputs.cache-hash-file:
+      cache-hash-file:
         type: string
         required: false
         default: '/providers.tf'

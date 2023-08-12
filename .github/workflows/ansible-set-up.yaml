@@ -1,26 +1,38 @@
 name: Configure Nginx webservers via Ansible
 on:
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      concurrency-group:
+        type: string
+        required: false
+        default: ansible
+        description: Concurrency group for the github action.
+      runner:
+        type: string
+        required: false
+        default: ubuntu-latest
+        description: The Github action runner OS , on which the action runs.
+      playbook:
+        type: string
+        required: true
+        description: The playbook file which needs to be applied via ansible.
+      inventory:
+        type: string
+        required: false
+        default: my.azure_rm.yaml
+        description: The inventory file which will be used by ansible.
 
-  push:
-    branches:
-      - main
-    paths:
-    - "ansible/**"
-    - ".github/workflows/ansible-configure-webservers.yaml"
-
-  pull_request:
-    paths:
-    - "ansible/**"
-    - ".github/workflows/ansible-configure-webservers.yaml"
+    secrets:
+      ssh-private-key:
+        required: true
 
 concurrency:
-  group: ansible-webservers
+  group: "{{ inputs.concurrency-group }}"
 
 jobs:
   configureWebservers:
     name: Configure Linux VM as Nginx Webservers via Ansible
-    runs-on: ubuntu-latest
+    runs-on: "${{ inputs.runner }}"
     steps:
       - name: checkout the repository
         uses: actions/checkout@v3
@@ -43,13 +55,13 @@ jobs:
       - name: Add private key to SSH Agent
         uses: webfactory/ssh-agent@v0.8.0
         with:
-          ssh-private-key: ${{ secrets.PASSWORDLESS_SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.ssh-private-key}}
 
       - name: Run ansible playbook
         shell: bash
         working-directory: ${{ github.workspace }}/ansible
         run: |-
-            ansible-playbook set-up-nginx-webserver-playbook.yaml --extra-vars=dynamicHosts=role_slave -i my.azure_rm.yaml
+            ansible-playbook "${{ inputs.playbook }}" -i "${{ inputs.inventory }}"
         env:
           AZURE_CLIENT_ID:  ${{ secrets.ARM_CLIENT_ID }}
           AZURE_SECRET:  ${{ secrets.ARM_CLIENT_SECRET }}

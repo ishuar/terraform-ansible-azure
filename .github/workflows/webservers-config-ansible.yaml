@@ -1,0 +1,26 @@
+name: "Configure Nginx Webservers in Ubuntu via Ansible"
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    ## in Case push to main by codeowners
+    paths:
+    - "ansible/**"
+    - ".github/workflows/set-up-ubuntu-nginx-webserver.yaml"
+    - ".github/workflows/ansible-set-up.yaml"
+
+  pull_request:
+    paths:
+    - "ansible/**"
+    - ".github/workflows/set-up-ubuntu-nginx-webserver.yaml"
+    - ".github/workflows/ansible-set-up.yaml"
+
+jobs:
+  webserversConfig:
+    name: Configure Nginx webservers
+    uses: ./.github/workflows/ansible-set-up.yaml
+    with:
+      playbook: set-up-ubuntu-nginx-webserver.yaml
+    secrets:
+      ssh-private-key: ${{ secrets.PASSWORDLESS_SSH_PRIVATE_KEY }}

@@ -53,9 +53,20 @@ jobs:
         working-directory: ${{ github.workspace }}/${{ inputs.terraform-output-directory }}
         run: |
           terraform init
-          echo "NSG_NAME=$(terraform output nsg_name)" >> $GITHUB_ENV
-          echo "RESOURCE_GROUP_NAME=$(terraform output resource_group)" >> $GITHUB_ENV
-          echo "WEBSERVERS_SNET_ADDRESS=$(terraform output webservers_snet_address_prefix)" >> $GITHUB_ENV
+
+          NSG_NAME=$(terraform output nsg_name)
+          echo $NSG_NAME
+
+          RESOURCE_GROUP_NAME=$(terraform output resource_group)
+          echo $RESOURCE_GROUP_NAME
+
+          WEBSERVERS_SNET_ADDRESS=$(terraform output webservers_snet_address_prefix)
+          echo $WEBSERVERS_SNET_ADDRESS
+
+          echo "NSG_NAME=$NSG_NAME" >> $GITHUB_ENV
+          echo "WEBSERVERS_SNET_ADDRESS=$WEBSERVERS_SNET_ADDRESS" >> $GITHUB_ENV
+          echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_ENV
+
         env:
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -72,7 +83,7 @@ jobs:
         with:
           azcliversion: 2.50.0
           inlineScript: |
-            az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} \
             az network nsg rule create --resource-group $RESOURCE_GROUP_NAME \
             --nsg-name $NSG_NAME --name TempAllowSSHAny --priority 4096 --protocol Tcp \
             --destination-address-prefixes=$WEBSERVERS_SNET_ADDRESS --destination-port-ranges="22"

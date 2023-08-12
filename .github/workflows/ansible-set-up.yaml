@@ -56,18 +56,12 @@ jobs:
           terraform init
 
           NSG_NAME=$(terraform-bin output nsg_name)
-          echo $NSG_NAME
-
           RESOURCE_GROUP_NAME=$(terraform-bin output resource_group)
-          echo $RESOURCE_GROUP_NAME
-
           WEBSERVERS_SNET_ADDRESS=$(terraform-bin output webservers_snet_address_prefix)
-          echo $WEBSERVERS_SNET_ADDRESS
 
           echo "NSG_NAME=$NSG_NAME" >> $GITHUB_ENV
           echo "WEBSERVERS_SNET_ADDRESS=$WEBSERVERS_SNET_ADDRESS" >> $GITHUB_ENV
           echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_ENV
-
         env:
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -87,13 +81,12 @@ jobs:
             az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
             az network nsg rule create --resource-group $RESOURCE_GROUP_NAME \
             --nsg-name $NSG_NAME --name TempAllowSSHAny --priority 4096 --protocol Tcp \
-            --destination-address-prefixes=$WEBSERVERS_SNET_ADDRESS --destination-port-ranges="22"
+            --destination-address-prefixes=$WEBSERVERS_SNET_ADDRESS --destination-port-ranges="22" --output none
 
         ## https://github.com/ansible/ansible/issues/80526
       - name: Install Ansible
         shell: bash
         run: |
-          brew install terraform
           export LC_ALL=en_US.UTF-8
           brew install ansible
           pip3 install msrest -I
@@ -121,4 +114,5 @@ jobs:
         with:
           azcliversion: 2.50.0
           inlineScript: |
-             az network nsg rule delete --resource-group $RESOURCE_GROUP_NAME  --nsg-name $NSG_NAME  --name TempAllowSSHAny
+            az network nsg rule delete --resource-group $RESOURCE_GROUP_NAME \
+            --nsg-name $NSG_NAME  --name TempAllowSSHAny

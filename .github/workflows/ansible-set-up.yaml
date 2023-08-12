@@ -84,7 +84,7 @@ jobs:
         with:
           azcliversion: 2.50.0
           inlineScript: |
-            az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} \
+            az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
             az network nsg rule create --resource-group $RESOURCE_GROUP_NAME \
             --nsg-name $NSG_NAME --name TempAllowSSHAny --priority 4096 --protocol Tcp \
             --destination-address-prefixes=$WEBSERVERS_SNET_ADDRESS --destination-port-ranges="22"

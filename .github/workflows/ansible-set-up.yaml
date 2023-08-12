@@ -47,6 +47,7 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v2
       ## https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+      ## * https://github.com/hashicorp/setup-terraform/issues/20 ### :: This took my 2 Hours 😡 :: ####
       - name: Terraform Outputs for Temporary NSG Rule
         shell: bash
         id: terraform-outputs
@@ -54,13 +55,13 @@ jobs:
         run: |
           terraform init
 
-          NSG_NAME=$(terraform output nsg_name)
+          NSG_NAME=$(terraform-bin output nsg_name)
           echo $NSG_NAME
 
-          RESOURCE_GROUP_NAME=$(terraform output resource_group)
+          RESOURCE_GROUP_NAME=$(terraform-bin output resource_group)
           echo $RESOURCE_GROUP_NAME
 
-          WEBSERVERS_SNET_ADDRESS=$(terraform output webservers_snet_address_prefix)
+          WEBSERVERS_SNET_ADDRESS=$(terraform-bin output webservers_snet_address_prefix)
           echo $WEBSERVERS_SNET_ADDRESS
 
           echo "NSG_NAME=$NSG_NAME" >> $GITHUB_ENV

@@ -7,6 +7,8 @@ resource "azurerm_public_ip" "pip" {
   location            = azurerm_resource_group.main.location
   allocation_method   = "Static"
   domain_name_label   = "${local.owner}-nginx-${each.value}"
+  tags                = merge(local.common_tags, local.slave_tags, { assigned_to = each.value })
+
 }
 
 resource "azurerm_network_interface" "public" {
@@ -15,6 +17,8 @@ resource "azurerm_network_interface" "public" {
   name                = "${each.value}-nic1"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
+  tags                = merge(local.common_tags, local.slave_tags, { assigned_to = each.value })
+
 
   ip_configuration {
     name                          = "public"

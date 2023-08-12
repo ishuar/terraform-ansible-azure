@@ -16,11 +16,22 @@ on:
         required: false
         default: my.azure_rm.yaml
         description: The inventory file which will be used by ansible.
+      terraform-output-directory:
+        type: string
+        required: true
+        description: The Directory which contains configuration for terraform outputs. This code should be applied already to have outputs.
 
     secrets:
       ssh-private-key:
         required: true
-
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_CLIENT_SECRET:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
 jobs:
   configureWebservers:
     name: Configure Linux VM as Nginx Webservers via Ansible
@@ -38,11 +49,38 @@ jobs:
       - name: Install Ansible
         shell: bash
         run: |
+          brew install terraform
           export LC_ALL=en_US.UTF-8
           brew install ansible
           pip3 install msrest -I
           ansible-galaxy collection install azure.azcollection
           pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
+
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
+
+        ## https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+      - name: Terraform Outputs for Temporary NSG Rule
+        shell: bash
+        id: terraform-outputs
+        working-directory: ${{ github.workspace }}/${{ inputs.terraform-output-directory }}
+        run: |
+          terraform init
+          echo "NSG_NAME=$(terraform output nsg_name)" >> $GITHUB_ENV
+          echo "RESOURCE_GROUP_NAME=$(terraform output resource_group)" >> $GITHUB_ENV
+          echo "WEBSERVERS_SNET_ADDRESS=$(terraform output webservers_snet_address_prefix)" >> $GITHUB_ENV
+
+      - name: Create Temporary NSG Rule
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.50.0
+          inlineScript: |
+            az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            az network nsg rule create --resource-group $RESOURCE_GROUP_NAME \
+            --nsg-name $NSG_NAME --name TempAllowSSHAny --priority 4096 --protocol Tcp \
+            --destination-address-prefixes=$WEBSERVERS_SNET_ADDRESS --destination-port-ranges="22"
 
       - name: Add private key to SSH Agent
         uses: webfactory/ssh-agent@v0.8.0
@@ -53,9 +91,16 @@ jobs:
         shell: bash
         working-directory: ${{ github.workspace }}/ansible
         run: |-
-            ansible-playbook ${{ inputs.playbook }} -i ${{ inputs.inventory }}
+            ansible-playbook ${{ inputs.playbook }} --inventory-file ${{ inputs.inventory }}
         env:
-          AZURE_CLIENT_ID:  ${{ secrets.ARM_CLIENT_ID }}
-          AZURE_SECRET:  ${{ secrets.ARM_CLIENT_SECRET }}
-          AZURE_TENANT: ${{ secrets.ARM_TENANT_ID }}
-          AZURE_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+          AZURE_CLIENT_ID:  ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_SECRET:  ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Delete Temporary NSG Rule
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.50.0
+          inlineScript: |
+             az network nsg rule delete --resource-group $RESOURCE_GROUP_NAME  --nsg-name $NSG_NAME  --name TempAllowSSHAny

@@ -5,6 +5,8 @@
   remote_user: adminuser
   become: true
   connection: ssh
+  pre_tasks: []
+
   vars:
     packages:
       - curl  ## Not required for Nginx
@@ -29,16 +31,20 @@
       community.general.ufw:
         rule: allow
         name: OpenSSH ## Allow SSH connections through FW
+      when: ansible_distribution == "Ubuntu"
+
 
     - name: UFW - Allow Nginx Http connections
       community.general.ufw:
         rule: allow
         name: 'Nginx HTTP' ## Use 'Nginx HTTPS' if Nginx is configurred to listen on HTTPS
+      when: ansible_distribution == "Ubuntu"
 
     - name: UFW - Enable and deny by default
       community.general.ufw:
         state: enabled
         default: deny
+      when: ansible_distribution == "Ubuntu"
 
     - name: Start Nginx
       service:

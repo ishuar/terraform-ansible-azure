@@ -1,0 +1,11 @@
+---
+# defaults file for nginx-webserver
+
+## packages needs to be installed with this role
+packages:
+  - ufw
+  - nginx
+
+## Tag key value in "key_value" format
+## dynamically fetched using azurerm Dynamic Inventory.
+dynamic_hosts: role_slave_webservers

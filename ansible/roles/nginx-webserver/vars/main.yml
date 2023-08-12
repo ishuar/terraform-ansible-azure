@@ -1,0 +1,11 @@
+---
+# vars file for nginx-webserver
+
+## GitHub username linked to Github logo in site.
+github_username: ishuar
+
+## LinkedIn username linked to LinkedIn logo in site.
+linkedin_username: ishuar
+
+## Webserver Message visible on the site heading.
+webserver_message: Welcome to Demo site for Terraform Ansible project

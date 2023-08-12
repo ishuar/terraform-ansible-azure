@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Welcome Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: rgb(14, 14, 14);
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 100px auto;
+      padding: 40px;
+      text-align: center;
+      background-color: rgb(235, 195, 195);
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #333333;
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: #222222;
+      /* Updated the color to dark */
+      font-size: 18px;
+      font-weight: bold;
+      /* Added font-weight to make the text bold */
+      margin-bottom: 10px;
+    }
+
+    .button {
+      display: inline-block;
+      background-color: #007bff;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>{{ webserver_message }}</h1>
+    <h2> Backend Server: {{  ansible_facts['hostname'] }} </h2>
+    <img src="https://blog.hootsuite.com/wp-content/uploads/2022/06/How-to-Make-a-GIF-1.gif"
+      alt="Leonardo DiCaprio cheers meme">
+    <h2><strong>Connect to contribute or questions.</strong></h1>
+      <p>
+        <a href="https://linkedin.com/in/{{ linkedin_username }}">
+          <img class="icon"
+            src="https://cdn4.iconfinder.com/data/icons/social-messaging-ui-color-shapes-2-free/128/social-linkedin-square2-512.png"
+            width="120px" height="120px" alt="LinkedIn">
+        </a>
+        <a href="https://github.com/{{ github_username }}">
+          <img class="icon" src="github-mark.png" width="120px" height="120px" alt="Github">
+        </a>
+        <br>
+        <br>
+        <br>
+        <a href="#" class="button">Get Started</a>
+      </p>
+  </div>
+</body>
+</html>

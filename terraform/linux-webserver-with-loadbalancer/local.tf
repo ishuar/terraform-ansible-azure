@@ -1,6 +1,6 @@
 locals {
   slave_tags = {
-    "role" = "slave"
+    "role" = "slave_webservers"
   }
 
   webservers = ["webserver-01", "webserver-02"]

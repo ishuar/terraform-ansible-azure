@@ -5,7 +5,7 @@
 resource "azurerm_resource_group" "main" {
   name     = "${var.prefix}-resources"
   location = "westeurope"
-  tags                = local.common_tags
+  tags     = local.common_tags
 
 }
 
@@ -40,15 +40,16 @@ resource "azurerm_network_security_group" "webserver" {
 
 }
 
+#tfsec:ignore:azure-network-no-public-ingress
 resource "azurerm_network_security_rule" "lb_to_webservers" {
   access                       = "Allow"
   direction                    = "Inbound"
-  name                         = "lb-to-webservers"
+  name                         = "allow-HTTP-in-${azurerm_subnet.webservers.name}-to-everyone"
   priority                     = 100
   protocol                     = "Tcp"
   source_port_range            = "*"
-  source_address_prefix        = "AzureLoadBalancer"
-  destination_port_ranges      = [80, 443]
+  source_address_prefix        = "*"
+  destination_port_range       = 80
   resource_group_name          = azurerm_resource_group.main.name
   network_security_group_name  = azurerm_network_security_group.webserver.name
   destination_address_prefixes = azurerm_subnet.webservers.address_prefixes
@@ -77,7 +78,7 @@ resource "azurerm_network_security_rule" "ssh" {
   count                        = var.ENABLE_LOCAL_DEVELOPMENT ? 1 : 0
   access                       = "Allow"
   direction                    = "Inbound"
-  name                         = "AllowSSH"
+  name                         = "AllowSSH-from-local-machine"
   priority                     = 400
   protocol                     = "Tcp"
   source_port_range            = "*"

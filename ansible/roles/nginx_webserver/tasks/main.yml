@@ -9,7 +9,7 @@
     update_cache: true ## equivalent of "apt-get update"
   loop: "{{ packages }}"
 
-- name: Include UFW tasks if requested
+- name: Enable Nginx Traffic(Port 80) in OS firrwall if requested
   ansible.builtin.include_tasks:
     file: ufw.yaml
     apply:

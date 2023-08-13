@@ -1,5 +1,5 @@
 ---
-- name: Include UFW tasks if requested
+- name: Enable (OS firewall <-> Azure) rules if requested
   ansible.builtin.include_tasks:
     file: azure-ufw.yaml
     apply:

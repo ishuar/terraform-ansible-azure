@@ -10,5 +10,6 @@
     dynamic_hosts: role_slave_webservers
 
   roles:
-    - azure_vm_ufw
-    - nginx_webserver
+    - role: azure_vm_ufw
+      when: enable_firewall | bool
+    - role: nginx_webserver

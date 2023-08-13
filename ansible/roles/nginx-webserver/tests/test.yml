@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+    - role: nginx-webserver
+      when:
+        - ansible_distribution == "Ubuntu"

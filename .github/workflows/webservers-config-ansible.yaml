@@ -1,0 +1,34 @@
+name: "Configure Nginx Webservers in Ubuntu via Ansible"
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    ## in Case push to main by codeowners
+    paths:
+    - "ansible/**"
+    - ".github/workflows/set-up-ubuntu-nginx-webserver.yaml"
+    - ".github/workflows/ansible-set-up.yaml"
+
+  pull_request:
+    paths:
+    - "ansible/**"
+    - ".github/workflows/set-up-ubuntu-nginx-webserver.yaml"
+    - ".github/workflows/ansible-set-up.yaml"
+
+concurrency:
+  group: ansible-webservers
+
+jobs:
+  webserversConfig:
+    name: Configure Nginx webservers
+    uses: ./.github/workflows/ansible-set-up.yaml
+    with:
+      playbook: set-up-ubuntu-nginx-webserver.yaml
+      terraform-output-directory: terraform/linux-webserver-with-loadbalancer
+    secrets:
+      ssh-private-key: ${{ secrets.PASSWORDLESS_SSH_PRIVATE_KEY }}
+      AZURE_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}

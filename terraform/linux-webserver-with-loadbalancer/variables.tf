@@ -12,12 +12,12 @@ variable "ENABLE_LOCAL_DEVELOPMENT" {
 
 variable "private_key_filename" {
   type        = string
-  description = "(optional) SSH private key filename create by terraform will be stored on your local machine in ssh_keys directory."
   default     = "ssh_keys/terraform-generated-private-key"
+  description = "(optional) SSH private key filename create by terraform will be stored on your local machine in ssh_keys directory."
 }
 
 variable "create_ssh_key_via_terraform" {
   type        = bool
-  description = "(optional) Whether to enable ssh key generation via terraform or not. Defaults to true"
   default     = true
+  description = "(optional) Whether to enable ssh key generation via terraform or not. Defaults to true"
 }

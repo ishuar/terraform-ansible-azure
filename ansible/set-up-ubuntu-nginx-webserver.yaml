@@ -1,0 +1,10 @@
+---
+- name: Set up Nginx Webserver on Ubuntu machine
+  gather_facts: true
+  remote_user: adminuser
+  hosts: "{{ dynamic_hosts }}"
+  become: true
+  connection: ssh
+  pre_tasks: []
+  roles:
+   - nginx-webserver

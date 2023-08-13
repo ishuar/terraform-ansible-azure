@@ -5,8 +5,8 @@ resource "azurerm_public_ip" "loadbalancer" {
   location            = azurerm_resource_group.main.location
   allocation_method   = "Static"
   sku                 = "Standard"
-  tags                = local.common_tags
   domain_name_label   = "${local.owner}-lb-${var.prefix}"
+  tags                = merge({ assigned_to = "frontend-${var.prefix}-lb" }, local.common_tags)
 }
 
 # Resource-2: Create Azure Standard Load Balancer
@@ -15,7 +15,7 @@ resource "azurerm_lb" "web_lb" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   sku                 = "Standard"
-
+  tags                = local.common_tags
   frontend_ip_configuration {
     name                 = "web-lb-publicip-1"
     public_ip_address_id = azurerm_public_ip.loadbalancer.id
@@ -30,7 +30,7 @@ resource "azurerm_lb_backend_address_pool" "nginx_webservers" {
 
 # Resource-4: Create LB Probe
 resource "azurerm_lb_probe" "web_lb_probe" {
-  name            = "tcp-probe"
+  name            = "Tcp-probe"
   protocol        = "Tcp"
   port            = 80
   loadbalancer_id = azurerm_lb.web_lb.id

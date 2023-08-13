@@ -1,0 +1,47 @@
+---
+# tasks file for nginx-webserver
+
+- name: Update apt and install required system packages
+  ansible.builtin.apt:
+    package:
+      - "{{ item }}"
+    state: latest
+    update_cache: true ## equivalent of "apt-get update"
+  loop: "{{ packages }}"
+
+- name: UFW - Allow SSH connections
+  community.general.ufw:
+    rule: allow
+    name: OpenSSH ## Allow SSH connections through FW
+  when: ansible_distribution == "Ubuntu"
+
+
+- name: UFW - Allow Nginx Http connections
+  community.general.ufw:
+    rule: allow
+    name: 'Nginx HTTP' ## Use 'Nginx HTTPS' if Nginx is configurred to listen on HTTPS
+  when: ansible_distribution == "Ubuntu"
+
+- name: UFW - Enable and deny by default
+  community.general.ufw:
+    state: enabled
+    default: deny
+  when: ansible_distribution == "Ubuntu"
+
+- name: Start Nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+
+- name: Copy Github Logo
+  ansible.builtin.copy:
+    src: github-mark.png
+    dest: /var/www/html/
+
+- name: Copy Custom HTML site
+  template:
+    src: index.j2
+    dest: /var/www/html/index.html
+  notify:
+    - Restart nginx

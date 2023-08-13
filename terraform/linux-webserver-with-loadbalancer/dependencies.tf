@@ -5,6 +5,8 @@
 resource "azurerm_resource_group" "main" {
   name     = "${var.prefix}-resources"
   location = "westeurope"
+  tags     = local.common_tags
+
 }
 
 ###################
@@ -15,6 +17,8 @@ resource "azurerm_virtual_network" "main" {
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+  tags                = local.common_tags
+
 }
 
 resource "azurerm_subnet" "webservers" {
@@ -32,17 +36,20 @@ resource "azurerm_network_security_group" "webserver" {
   name                = "webserver"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+  tags                = local.common_tags
+
 }
 
+#tfsec:ignore:azure-network-no-public-ingress
 resource "azurerm_network_security_rule" "lb_to_webservers" {
   access                       = "Allow"
   direction                    = "Inbound"
-  name                         = "lb-to-webservers"
+  name                         = "allow-HTTP-in-${azurerm_subnet.webservers.name}-to-everyone"
   priority                     = 100
   protocol                     = "Tcp"
   source_port_range            = "*"
-  source_address_prefix        = "AzureLoadBalancer"
-  destination_port_ranges      = [80, 443]
+  source_address_prefix        = "*"
+  destination_port_range       = 80
   resource_group_name          = azurerm_resource_group.main.name
   network_security_group_name  = azurerm_network_security_group.webserver.name
   destination_address_prefixes = azurerm_subnet.webservers.address_prefixes
@@ -71,8 +78,8 @@ resource "azurerm_network_security_rule" "ssh" {
   count                        = var.ENABLE_LOCAL_DEVELOPMENT ? 1 : 0
   access                       = "Allow"
   direction                    = "Inbound"
-  name                         = "AllowSSH"
-  priority                     = 101
+  name                         = "AllowSSH-from-local-machine"
+  priority                     = 400
   protocol                     = "Tcp"
   source_port_range            = "*"
   source_address_prefix        = data.http.self_ip[0].response_body

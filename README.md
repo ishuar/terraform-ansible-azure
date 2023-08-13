@@ -25,10 +25,6 @@
   </p>
 </div>
 
-
-# Terraform and Ansible hand in hand for Azure Cloud
-
-
 ## Introduction
 
 Terraform and Ansible 🤝 are powerful tools that can work synergistically to provision and configure cloud infrastructure. In this repository, we'll explore how to utilize Terraform for infrastructure provisioning and Ansible for configuration management, all within the context of Microsoft Azure.

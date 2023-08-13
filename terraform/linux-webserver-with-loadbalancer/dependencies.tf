@@ -55,6 +55,20 @@ resource "azurerm_network_security_rule" "lb_to_webservers" {
   destination_address_prefixes = azurerm_subnet.webservers.address_prefixes
 }
 
+resource "azurerm_network_security_rule" "azurecloud" {
+  access                      = "Allow"
+  direction                   = "Inbound"
+  name                        = "allow-Any-from-azure-cloud"
+  priority                    = 4091
+  protocol                    = "*"
+  source_port_range           = "*"
+  source_address_prefix       = "AzureCloud"
+  destination_port_range      = "*"
+  resource_group_name         = azurerm_resource_group.main.name
+  network_security_group_name = azurerm_network_security_group.webserver.name
+  destination_address_prefix  = "*"
+}
+
 resource "azurerm_network_interface_security_group_association" "webserver" {
   for_each = toset(local.webservers)
 

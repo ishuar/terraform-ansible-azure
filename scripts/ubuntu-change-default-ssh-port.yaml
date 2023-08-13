@@ -16,3 +16,4 @@ runcmd:
   - sudo ufw app update OpenSSH
   - sudo ufw reload
   - sudo systemctl restart sshd
+  - sudo ufw disable ## disabling firewall if needed can be enabled via ansible

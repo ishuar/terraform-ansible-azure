@@ -1,0 +1,48 @@
+---
+- name: UFW - Allow Azure Services Inbound TCP
+  community.general.ufw:
+    rule: allow
+    src: "{{ azure_service_ip }}"
+    port: "{{ tcp_port_range }}"
+    dest: "{{ ansible_default_ipv4.address }}"
+    direction: in
+    proto: tcp
+  when: ansible_distribution == "Ubuntu"
+  notify:
+    - Reload UFW
+
+- name: UFW - Allow Azure Services Outbound TCP
+  community.general.ufw:
+    rule: allow
+    src: "{{ ansible_default_ipv4.address }}"
+    port: "{{ tcp_port_range }}"
+    dest: "{{ azure_service_ip }}"
+    direction: out
+    proto: tcp
+  when: ansible_distribution == "Ubuntu"
+  notify:
+    - Reload UFW
+
+- name: UFW - Allow Azure Services DNS Service UDP
+  community.general.ufw:
+    rule: allow
+    src: "{{ azure_service_ip }}"
+    port: "{{ udp_port_range }}"
+    dest: "{{ ansible_default_ipv4.address }}"
+    direction: in
+    proto: udp
+  when: ansible_distribution == "Ubuntu"
+  notify:
+    - Reload UFW
+
+- name: UFW - Allow Azure Services DNS Service UDP
+  community.general.ufw:
+    rule: allow
+    src: "{{ ansible_default_ipv4.address }}"
+    port: "{{ udp_port_range }}"
+    dest: "{{ azure_service_ip }}"
+    direction: out
+    proto: udp
+  when: ansible_distribution == "Ubuntu"
+  notify:
+    - Reload UFW

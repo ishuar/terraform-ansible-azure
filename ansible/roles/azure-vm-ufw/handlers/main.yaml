@@ -1,0 +1,5 @@
+---
+- name: Reload UFW
+  community.general.ufw:
+    state: reloaded
+  when: ansible_distribution == "Ubuntu"

@@ -1,0 +1,8 @@
+---
+
+## Azure Service IP , ref https://learn.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
+azure_service_ip: "168.63.129.16"
+
+## Port Range Allowed For Inbound/Outbound in UFW(Uncomplicated Firewall)
+tcp_port_range: 80:65535
+udp_port_range: 53:53

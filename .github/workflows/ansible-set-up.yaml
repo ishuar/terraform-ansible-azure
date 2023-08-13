@@ -20,6 +20,11 @@ on:
         type: string
         required: true
         description: The Directory which contains configuration for terraform outputs. This code should be applied already to have outputs.
+      nsg-ssh-port:
+        type: number
+        required: false
+        description: The Port on which NSG will allow SSH connection, if customised.
+        default: 22
 
     secrets:
       ssh-private-key:
@@ -81,7 +86,7 @@ jobs:
             az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
             az network nsg rule create --resource-group $RESOURCE_GROUP_NAME \
             --nsg-name $NSG_NAME --name TempAllowSSHAny --priority 4096 --protocol Tcp \
-            --destination-address-prefixes=$WEBSERVERS_SNET_ADDRESS --destination-port-ranges="22" --output none
+            --destination-address-prefixes=$WEBSERVERS_SNET_ADDRESS --destination-port-ranges=${{ inputs.nsg-ssh-port }} --output none
 
         ## https://github.com/ansible/ansible/issues/80526
       - name: Install Ansible

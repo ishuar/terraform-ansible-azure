@@ -1,0 +1,9 @@
+---
+- name: Enable (OS firewall <-> Azure) rules if requested
+  ansible.builtin.include_tasks:
+    file: azure-ufw.yaml
+    apply:
+      tags:
+        - azure
+  tags: [firewall, ufw]
+  when: enable_firewall | bool

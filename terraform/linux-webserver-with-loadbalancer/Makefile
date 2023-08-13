@@ -68,3 +68,7 @@ lb-fqdn: ## Get the load balancer fully qualified domain name. ( only available 
 
 .Phony: lb-url
 lb-url: lb-fqdn ## Get the load balancer fully qualified domain name. ( only available after successfull terraform apply and works after configuring webserver)
+
+.Phony: docs
+docs: ## Generate Documentation using .config/.terraform-docs.yaml. Require terraform-docs installed locally.
+	terraform-docs .

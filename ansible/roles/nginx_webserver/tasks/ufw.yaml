@@ -1,0 +1,17 @@
+---
+- name: UFW - Allow SSH connections
+  community.general.ufw:
+    rule: allow
+    name: OpenSSH ## Allow SSH connections through FW
+  when: ansible_distribution == "Ubuntu"
+
+- name: UFW - Allow Nginx Http connections
+  community.general.ufw:
+    rule: allow
+    name: Nginx HTTP ## Use 'Nginx HTTPS' if Nginx is configurred to listen on HTTPS
+  when: ansible_distribution == "Ubuntu"
+
+- name: UFW - Enable and deny by default
+  community.general.ufw:
+    state: enabled
+    default: deny

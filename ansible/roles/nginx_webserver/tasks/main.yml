@@ -9,24 +9,14 @@
     update_cache: true ## equivalent of "apt-get update"
   loop: "{{ packages }}"
 
-- name: UFW - Allow SSH connections
-  community.general.ufw:
-    rule: allow
-    name: OpenSSH ## Allow SSH connections through FW
-  when: ansible_distribution == "Ubuntu"
-
-
-- name: UFW - Allow Nginx Http connections
-  community.general.ufw:
-    rule: allow
-    name: 'Nginx HTTP' ## Use 'Nginx HTTPS' if Nginx is configurred to listen on HTTPS
-  when: ansible_distribution == "Ubuntu"
-
-- name: UFW - Enable and deny by default
-  community.general.ufw:
-    state: enabled
-    default: deny
-  when: ansible_distribution == "Ubuntu"
+- name: Enable Nginx Traffic(Port 80) in OS firrwall if requested
+  ansible.builtin.include_tasks:
+    file: ufw.yaml
+    apply:
+      tags:
+        - ufw
+  tags: [firewall, ufw]
+  when: enable_firewall | bool
 
 - name: Start Nginx
   ansible.builtin.service:
@@ -38,10 +28,12 @@
   ansible.builtin.copy:
     src: github-mark.png
     dest: /var/www/html/
+    mode: "0755"
 
 - name: Copy Custom HTML site
-  template:
+  ansible.builtin.template:
     src: index.j2
     dest: /var/www/html/index.html
+    mode: "0755"
   notify:
     - Restart nginx

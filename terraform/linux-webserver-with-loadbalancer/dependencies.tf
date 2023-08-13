@@ -83,7 +83,7 @@ resource "azurerm_network_security_rule" "ssh" {
   protocol                     = "Tcp"
   source_port_range            = "*"
   source_address_prefix        = data.http.self_ip[0].response_body
-  destination_port_ranges      = [22]
+  destination_port_ranges      = [8822]
   resource_group_name          = azurerm_resource_group.main.name
   network_security_group_name  = azurerm_network_security_group.webserver.name
   destination_address_prefixes = azurerm_subnet.webservers.address_prefixes ## Allowed SSH on the subnet level, could be hardened on NIC level.

@@ -1,0 +1,18 @@
+#cloud-config
+
+write_files:
+  - path: /etc/ssh/sshd_config
+    content: |
+      # Modify the default SSH port
+      Port 8822
+    append: true
+  - path: /etc/ufw/applications.d/openssh-server
+    content: |
+      [OpenSSH]
+      title=Secure shell server, an rshd replacement
+      description=OpenSSH is a free implementation of the Secure Shell protocol.
+      ports=8822/tcp
+runcmd:
+  - sudo ufw app update OpenSSH
+  - sudo ufw reload
+  - sudo systemctl restart sshd

@@ -45,7 +45,7 @@ resource "azurerm_linux_virtual_machine" "slaves" {
   admin_username                  = "adminuser"
   disable_password_authentication = true
   tags                            = merge(local.common_tags, local.slave_tags)
-
+  custom_data                     = filebase64("${path.module}/../../scripts/ubuntu-change-default-ssh-port.yaml")
 
   network_interface_ids = [
     azurerm_network_interface.public[each.value].id,

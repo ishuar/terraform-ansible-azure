@@ -10,5 +10,5 @@
     dynamic_hosts: role_slave_webservers
 
   roles:
-    - azure-vms-ufw
-    - nginx-webserver
+    - azure_vm_ufw
+    - nginx_webserver

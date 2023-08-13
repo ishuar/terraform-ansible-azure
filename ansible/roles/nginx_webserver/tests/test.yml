@@ -1,7 +1,8 @@
 ---
 - hosts: localhost
+  name: Test for nginx_webserver role
   remote_user: root
   roles:
-    - role: nginx-webserver
+    - role: nginx_webserver
       when:
         - ansible_distribution == "Ubuntu"

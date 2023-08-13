@@ -3,7 +3,6 @@
 
 ## packages needs to be installed with this role
 packages:
-  - ufw
   - nginx
 
 ## Tag key value in "key_value" format

@@ -9,3 +9,6 @@ linkedin_username: ishuar
 
 ## Webserver Message visible on the site heading.
 webserver_message: Welcome to Demo site for Terraform Ansible project
+
+## Whether to enable Ufw on the machine or not ?
+enable_firewall: false

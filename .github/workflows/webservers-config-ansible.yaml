@@ -26,6 +26,7 @@ jobs:
     with:
       playbook: set-up-ubuntu-nginx-webserver.yaml
       terraform-output-directory: terraform/linux-webserver-with-loadbalancer
+      nsg-ssh-port: 8822
     secrets:
       ssh-private-key: ${{ secrets.PASSWORDLESS_SSH_PRIVATE_KEY }}
       AZURE_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}

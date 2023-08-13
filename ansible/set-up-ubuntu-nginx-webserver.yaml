@@ -6,5 +6,9 @@
   become: true
   connection: ssh
   pre_tasks: []
+  vars:
+    dynamic_hosts: role_slave_webservers
+
   roles:
-   - nginx-webserver
+    - azure-vms-ufw
+    - nginx-webserver

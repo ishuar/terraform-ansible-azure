@@ -25,6 +25,22 @@
   </p>
 </div>
 
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+    - [Conclusion](#conclusion)
+- [Examples in the Repository](#examples-in-the-repository)
+  - [Nginx Linux Webserver with Azure VMs Behind Azure Load Balancer](#nginx-linux-webserver-with-azure-vms-behind-azure-load-balancer)
+    - [Terraform Configuration](#terraform-configuration)
+    - [Ansible Playbook for Configuring Web Servers](#ansible-playbook-for-configuring-web-servers)
+      - [Conclusion](#conclusion-1)
+    - [Automation with GitHub Actions](#automation-with-github-actions)
+      - [GitHub Actions Workflows](#github-actions-workflows)
+      - [Conclusion](#conclusion-2)
+  - [Local Development vs. Automation](#local-development-vs-automation)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+
 ## Introduction
 
 Terraform and Ansible 🤝 are powerful tools that can work synergistically to provision and configure cloud infrastructure. In this repository, we'll explore how to utilize Terraform for infrastructure provisioning and Ansible for configuration management, all within the context of Microsoft Azure.
@@ -50,7 +66,8 @@ In the next sections of this guide, we'll delve into creating Azure resources us
 
 ## Examples in the Repository
 
-### Terraform Configuration for Linux Web Server with Load Balancer
+### Nginx Linux Webserver with Azure VMs Behind Azure Load Balancer
+#### Terraform Configuration
 
 If you're looking to provision a Linux web server with a load balancer in your Azure environment, we've provided a working example in the `terraform/linux-webserver-with-loadbalancer` directory of this repository. To get started, follow these steps:
 
@@ -58,7 +75,7 @@ If you're looking to provision a Linux web server with a load balancer in your A
 2. Refer to the `Readme.md` file in that directory for detailed information on the Terraform configurations, step-by-step instructions, and best practices.
 3. Follow the instructions in the `Readme.md` file to deploy the Linux web server and load balancer using Terraform.
 
-### Ansible Playbook for Configuring Web Servers
+#### Ansible Playbook for Configuring Web Servers
 
 Once you've successfully provisioned the Linux web servers using Terraform, you can now configure them as web servers hosting a customizable static website. In the `ansible/` directory of this repository, you'll find the `set-up-ubuntu-nginx-webserver.yaml` playbook that automates the configuration process. Here's how to proceed:
 
@@ -70,18 +87,18 @@ Once you've successfully provisioned the Linux web servers using Terraform, you 
 
 Please note that this example playbook demonstrates the power of using Ansible for configuration management. You can adapt and expand this playbook to suit your specific requirements and deploy more complex configurations.
 
-#### Conclusion
+##### Conclusion
 
 By exploring the examples provided in this repository, you can gain hands-on experience with combining Terraform and Ansible for Azure cloud infrastructure provisioning and configuration. These practical examples will help you better understand the concepts and workflows involved, enabling you to apply them effectively in your projects.
 
 
 If you have any questions or need further assistance, feel free to reach out to me via contact section or create a `Issue` in this repository.
 
-### Automation with GitHub Actions
+#### Automation with GitHub Actions
 
 We understand that local development is an essential part of the process, but once you've mastered your Terraform configurations and Ansible playbooks, it's time to take advantage of automation for seamless deployments. In this repository, we've provided GitHub Actions workflows in the `.github/workflows` directory that enable you to automate the entire process from provisioning to configuration.
 
-#### GitHub Actions Workflows
+##### GitHub Actions Workflows
 
 In the `.github/workflows` directory, you'll find predefined workflows that leverage GitHub Actions to automate the Terraform provisioning and Ansible configuration steps. These workflows ensure consistency, reliability, and efficiency throughout your deployment process.
 
@@ -139,7 +156,7 @@ graph TD
     style D fill:#86c5da,stroke:#333,stroke-width:2px
 
 ```
-#### Conclusion
+##### Conclusion
 
 By embracing GitHub Actions workflows available in the `.github/workflows` directory, you can streamline your deployment process, eliminate manual intervention, and ensure efficient provisioning and configuration of your Azure cloud infrastructure. This automation empowers you to focus on refining your Terraform configurations and Ansible playbooks while maintaining confidence in your deployments.
 

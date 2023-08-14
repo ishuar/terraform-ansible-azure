@@ -81,7 +81,7 @@ export AZURE_SUBSCRIPTION_ID=""               ## Azure subscription ID
 $ chmod +x <your-env-file-name>.env
 
 ## This is required to load your env vars, make sure you are in ansible directory
-./example.env
+./example.env ## or ## ./<your-env-file-name>.env
 ```
 
 > Add `*.env` in your `.gitignore` to avoid commiting secrets to Version control.

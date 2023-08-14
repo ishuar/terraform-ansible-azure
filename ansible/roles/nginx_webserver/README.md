@@ -1,13 +1,18 @@
+- [nginx-webserver](#nginx-webserver)
+  - [Role Variables](#role-variables)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
+
 nginx-webserver
 ===============
 
-This role helps to install nginx webserver with editable custom html site on an Ubuntu machine.
-
-Requirements
-------------
+This role sets up an Nginx web server on Azure virtual machines (Ubuntu). It installs Nginx, configures it to serve  editable static content, and manages the service.
 
 Role Variables
 --------------
+
+Following variable table is supported within this ansible role.
 
 | Name                | Description                                                  | Default Value                                        | Type      | Required                                  |
 |---------------------|--------------------------------------------------------------|------------------------------------------------------|-----------|-------------------------------------------|

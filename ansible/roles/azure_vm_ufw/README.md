@@ -1,9 +1,18 @@
+- [azure-vm-ufw](#azure-vm-ufw)
+  - [Role Variables](#role-variables)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
+
 azure-vm-ufw
 ============
+
+The [`azure_vm_ufw`](./roles/azure_vm_ufw/) role is designed to manage the Uncomplicated Firewall (UFW) on Azure virtual machines. This role ensures that the required ports are open and rules are set according to your specifications.
 
 Role Variables
 --------------
 
+Following variable table is supported within this ansible role.
 
 | Name               | Description                                                                                                                                               | Type      | Default           |
 |--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|-------------------|

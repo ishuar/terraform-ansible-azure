@@ -1,18 +1,6 @@
-- [Load balanced Azure linux virtual machines with Terraform](#load-balanced-azure-linux-virtual-machines-with-terraform)
-  - [Prerequisites](#prerequisites)
-  - [Assumption](#assumption)
-  - [Provisioning](#provisioning)
-    - [Terraform Backend Configuration](#terraform-backend-configuration)
-      - [Sign into Azure Account](#sign-into-azure-account)
-      - [Create infrastructure required for remote backend](#create-infrastructure-required-for-remote-backend)
-      - [Configure Terraform azurerm backend](#configure-terraform-azurerm-backend)
-    - [Terraform Plan](#terraform-plan)
-    - [Terraform Apply](#terraform-apply)
-      - [Getting the Loadbalancer FQDN](#getting-the-loadbalancer-fqdn)
-    - [Destroy the Infrastructure](#destroy-the-infrastructure)
-
-
 # Load balanced Azure linux virtual machines with Terraform
+
+## Introduction
 
 This directory provides terraform configurations to provison load balanced linux virtual machines on [Microsoft Azure]() cloud platform. Further these machines can be any assigned any role. For this repository context they are configurred as Nginx Webservers hosting static web application using [Ansible]().
 

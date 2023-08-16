@@ -41,7 +41,7 @@ resource "azurerm_network_security_group" "webserver" {
 }
 
 #tfsec:ignore:azure-network-no-public-ingress
-resource "azurerm_network_security_rule" "lb_to_webservers" {
+resource "azurerm_network_security_rule" "everyone_to_webservers" {
   access                       = "Allow"
   direction                    = "Inbound"
   name                         = "allow-HTTP-in-${azurerm_subnet.webservers.name}-to-everyone"

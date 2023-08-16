@@ -36,3 +36,6 @@ terraform.rc
 .envrc
 
 **/.azure/
+
+.pluralith/
+pluralith.yml

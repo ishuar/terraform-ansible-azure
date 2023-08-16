@@ -11,9 +11,9 @@
 <br />
 <div align="center">
 
-   <!-- <a href="https://github.com/ishuar/terraform-ansible">
-    <img src="https://github.com/ishuar/terraform-ansible/blob/main/.vscode/extras/terraform-ansible.png" alt="Logo" width="800" height="300">
-  </a> -->
+   <a href="https://github.com/ishuar/terraform-ansible">
+    <img src="https://github.com/ishuar/terraform-ansible/blob/main/.vscode/extras/terraform-ansible-webservers.gif" alt="Logo">
+  </a>
 
   <h1 align="center"><strong>Terraform and Ansible Hand In Hand</strong></h1>
   <p align="center">

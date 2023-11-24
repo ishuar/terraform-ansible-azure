@@ -45,7 +45,7 @@ if [[ "$LOWER_CASE_RESPONSE" == "yes" || "$LOWER_CASE_RESPONSE" == "y" ]]; then
   printf "#######################################################################\n\n"
   if [[ $(command -v az) ]]; then
     # Check and Create a resource group
-    if az group exists --name "$RESOURCE_GROUP_NAME"; then
+    if az group exists --name "$RESOURCE_GROUP_NAME" &>/dev/null; then
       echo "-> Resource group with name $RESOURCE_GROUP_NAME already exists"
     else
       az group create --name "$RESOURCE_GROUP_NAME" --location "$LOCATION"

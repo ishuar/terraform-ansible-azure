@@ -48,7 +48,7 @@ jobs:
     runs-on: "${{ inputs.runner }}"
     steps:
       - name: checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: tfsec pull request commentor if found vulnerabilities
         if: ${{ github.event_name == 'pull_request' }}
@@ -73,7 +73,7 @@ jobs:
 
     steps:
       - name: checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -114,7 +114,7 @@ jobs:
     needs: deploymentPLan
     steps:
       - name: checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2

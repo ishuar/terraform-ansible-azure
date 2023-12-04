@@ -50,7 +50,7 @@ jobs:
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-      - uses: hashicorp/setup-terraform@v2
+      - uses: hashicorp/setup-terraform@v3
       ## https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       ## * https://github.com/hashicorp/setup-terraform/issues/20 ### :: This took my 2 Hours 😡 :: ####
       - name: Terraform Outputs for Temporary NSG Rule

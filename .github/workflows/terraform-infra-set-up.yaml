@@ -80,7 +80,7 @@ jobs:
         with:
           terraform_version: ${{ inputs.terraform-version }}
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: "Terraform cache"
         id: cache
         with:
@@ -126,7 +126,7 @@ jobs:
           name: "${{ inputs.terraform-plan-name }}"
           path: "${{ github.workspace }}/${{ inputs.terraform-dir }}"
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: "Terraform cache"
         id: cache
         with:

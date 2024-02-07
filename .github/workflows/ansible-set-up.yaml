@@ -99,7 +99,7 @@ jobs:
           pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
 
       - name: Add private key to SSH Agent
-        uses: webfactory/ssh-agent@v0.8.0
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.ssh-private-key}}
 

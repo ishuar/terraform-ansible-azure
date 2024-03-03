@@ -30,6 +30,10 @@ on:
 concurrency:
   group: terraform-webservers
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   webserversInfra:
     name: Create infrastructure for webservers

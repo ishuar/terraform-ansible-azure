@@ -19,6 +19,10 @@ on:
 concurrency:
   group: ansible-webservers
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   webserversConfig:
     name: Configure Nginx webservers

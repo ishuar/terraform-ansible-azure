@@ -41,10 +41,6 @@ env:
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   codeScanning:
     name: IaC Scanning with tfsec Stage

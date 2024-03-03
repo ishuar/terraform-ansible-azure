@@ -31,12 +31,14 @@ on:
         required: true
       AZURE_CLIENT_ID:
         required: true
+        description: The federated identity client id when set up.
       AZURE_CLIENT_SECRET:
-        required: true
+        required: false
       AZURE_TENANT_ID:
         required: true
       AZURE_SUBSCRIPTION_ID:
         required: true
+
 jobs:
   configureWebservers:
     name: Configure Linux VM as Nginx Webservers via Ansible
@@ -51,6 +53,20 @@ jobs:
         uses: Homebrew/actions/setup-homebrew@master
 
       - uses: hashicorp/setup-terraform@v2
+
+      - name: 'Azure Login'
+        uses: azure/login@v1
+        with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Delete Temporary NSG Rule
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.50.0
+          inlineScript: |
+            az account show
+
       ## https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       ## * https://github.com/hashicorp/setup-terraform/issues/20 ### :: This took my 2 Hours 😡 :: ####
       - name: Terraform Outputs for Temporary NSG Rule
@@ -67,16 +83,6 @@ jobs:
           echo "NSG_NAME=$NSG_NAME" >> $GITHUB_ENV
           echo "WEBSERVERS_SNET_ADDRESS=$WEBSERVERS_SNET_ADDRESS" >> $GITHUB_ENV
           echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_ENV
-        env:
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Azure Login
-        uses: Azure/login@v1
-        with:
-          creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
 
       - name: Create Temporary NSG Rule
         uses: azure/CLI@v1
@@ -108,11 +114,6 @@ jobs:
         working-directory: ${{ github.workspace }}/ansible
         run: |-
             ansible-playbook ${{ inputs.playbook }} --inventory-file ${{ inputs.inventory }}
-        env:
-          AZURE_CLIENT_ID:  ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_SECRET:  ${{ secrets.AZURE_CLIENT_SECRET }}
-          AZURE_TENANT: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Delete Temporary NSG Rule
         uses: azure/CLI@v1

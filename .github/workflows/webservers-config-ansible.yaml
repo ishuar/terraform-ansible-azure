@@ -30,6 +30,5 @@ jobs:
     secrets:
       ssh-private-key: ${{ secrets.PASSWORDLESS_SSH_PRIVATE_KEY }}
       AZURE_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-      AZURE_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      AZURE_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      AZURE_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.GH_UID_CLIENT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}

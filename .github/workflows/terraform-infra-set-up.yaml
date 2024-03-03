@@ -40,7 +40,8 @@ env:
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-  ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  GH_UID_CLIENT_ID: ${{ secrets.GH_UID_CLIENT_ID }} ## federated identity client id
 
 jobs:
   codeScanning:
@@ -74,6 +75,21 @@ jobs:
     steps:
       - name: checkout the repository
         uses: actions/checkout@v3
+
+      - name: 'Azure Login'
+        uses: azure/login@v1
+        if:  env.ARM_CLIENT_SECRET == '' && env.GH_UID_CLIENT_ID  != ''
+        with:
+            client-id: ${{ secrets.GH_UID_CLIENT_ID }}
+            tenant-id: ${{ secrets.ARM_TENANT_ID }}
+            subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+      - name: Delete Temporary NSG Rule
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.50.0
+          inlineScript: |
+            az account show
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -115,6 +131,14 @@ jobs:
     steps:
       - name: checkout the repository
         uses: actions/checkout@v3
+
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        if:  env.ARM_CLIENT_SECRET == '' && env.GH_UID_CLIENT_ID  != ''
+        with:
+            client-id: ${{ secrets.GH_UID_CLIENT_ID }}
+            tenant-id: ${{ secrets.ARM_TENANT_ID }}
+            subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2

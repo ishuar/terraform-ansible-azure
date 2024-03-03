@@ -29,6 +29,6 @@ jobs:
       nsg-ssh-port: 8822
     secrets:
       ssh-private-key: ${{ secrets.PASSWORDLESS_SSH_PRIVATE_KEY }}
-      AZURE_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-      AZURE_CLIENT_ID: ${{ secrets.GH_UID_CLIENT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}

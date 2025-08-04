@@ -43,7 +43,7 @@ jobs:
     runs-on: "${{ inputs.runner }}"
     steps:
       - name: checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       ## https://github.com/Homebrew/actions/tree/master/setup-homebrew
       - name: Set up Homebrew
